@@ -1,6 +1,3 @@
-<<<<<<< HEAD
-# digital-inclusion-project
-=======
 # Digital Inclusion Project
 
 ## 📄 Descrição do Projeto
