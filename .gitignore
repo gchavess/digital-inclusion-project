@@ -1,3 +1,10 @@
+modelo_final.joblib
+models/model.joblib
+models/modelo_final.joblib
+models/*.joblib
+
 modelo_final.pkl
 models/model.pkl
 models/modelo_final.pkl
+models/*.pkl
+
