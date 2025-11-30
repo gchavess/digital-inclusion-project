@@ -102,7 +102,7 @@ digital-inclusion-project/
 │   └── predict.py
 │
 ├── models/
-│   └── model.pkl
+│   └── modelo_final.pkl
 │
 ├── requirements.txt
 └── README.md

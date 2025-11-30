@@ -5,7 +5,7 @@ import pickle
 import json
 
 # Carregar modelo
-with open("models/model.pkl", "rb") as f:
+with open("models/modelo_final.pkl", "rb") as f:
     model = pickle.load(f)
 
 # Carregar lista de features usadas no treinamento

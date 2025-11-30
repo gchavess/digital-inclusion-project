@@ -43,12 +43,12 @@ pipeline = Pipeline([
 pipeline.fit(X_train, y_train)
 
 # Salvar modelo
-with open(MODEL_DIR / "model.pkl", "wb") as f:
+with open(MODEL_DIR / "modelo_final.pkl", "wb") as f:
     pickle.dump(pipeline, f)
 
 # Salvar features usadas
 with open(MODEL_DIR / "features.json", "w") as f:
     json.dump(features, f)
 
-print("Modelo treinado e salvo em models/model.pkl")
+print("Modelo treinado e salvo em models/modelo_final.pkl")
 print("Features salvas em models/features.json")
