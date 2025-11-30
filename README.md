@@ -135,4 +135,3 @@ python scripts/predict.py
 ```
 
 4. Visualizar notebooks para exploração detalhada e análise.
->>>>>>> bd73557 (feat: init project)
