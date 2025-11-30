@@ -1,39 +1,55 @@
-# Usa o modelo treinado para prever novos valores
+#$ python3 scripts/predict.py --model RandomForest --input data/internet_adoption_clean_final.csv        
 
+# scripts/predict.py
 import pandas as pd
-import pickle
-import json
+import joblib
+import argparse
+import os
 
-# Carregar modelo
-with open("models/modelo_final.pkl", "rb") as f:
-    model = pickle.load(f)
+MODEL_DIR = "models"
 
-# Carregar lista de features usadas no treinamento
-with open("models/features.json", "r") as f:
-    features = json.load(f)
+def main(model_name, input_file):
+    # Carregar modelo
+    model_path = os.path.join(MODEL_DIR, f"{model_name}.pkl")
+    if not os.path.exists(model_path):
+        print(f"Modelo {model_name} não encontrado!")
+        return
+    
+    model = joblib.load(model_path)
+    
+    # Carregar dados de entrada
+    df_input = pd.read_csv(input_file)
+    
+    # Renomear colunas para coincidir com treino
+    df_input.columns = [c.strip().replace(' ', '_')
+                        .replace('(', '').replace(')', '')
+                        .replace('%', 'pct') for c in df_input.columns]
+    
+    # Remover coluna alvo se existir
+    TARGET = 'Internet_Penetration_pct'
+    if TARGET in df_input.columns:
+        df_input = df_input.drop(columns=[TARGET])
+    
+    # Selecionar apenas colunas numéricas
+    X_input = df_input.select_dtypes(include='number')
+    
+    # Gerar previsões
+    predictions = model.predict(X_input)
+    
+    df_input['prediction'] = predictions
+    print("\nPrevisões:\n", df_input.head(10))
+    
+    # Salvar previsões em CSV
+    output_file = os.path.join(MODEL_DIR, f"predictions_{model_name}.csv")
+    df_input.to_csv(output_file, index=False)
+    print(f"\nPrevisões salvas em {output_file}")
 
-# Exemplo: prever para um país
-novo_pais = {
-    "Latitude": -15.78,
-    "Longitude": -47.93,
-    "GDP_per_capita": 13000,
-    "E_Commerce_Penetration (%)": 55,
-    "Device_Penetration (%)": 78,
-    "Government_Digital_Policy_Index (%)": 62,
-    "Data_Privacy_Regulation_Strength (%)": 70,
-    "Urbanization_Rate (%)": 87,
-    "Education_Index": 0.73,
-    "Mobile_Data_Price_USD": 2.1,
-    # ... COMPLETE TODAS AS FEATURES AQUI
-}
-
-# Criar um DF com todas as colunas
-df = pd.DataFrame([novo_pais])
-
-# Garantir que as colunas estejam na ordem correta
-df = df.reindex(columns=features)
-
-# Prever
-pred = model.predict(df)[0]
-
-print(f"Previsão: {pred}")
+if __name__ == "__main__":
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--model", type=str, required=True,
+                        help="Nome do modelo: LinearRegression, RandomForest, XGBoost")
+    parser.add_argument("--input", type=str, required=True,
+                        help="Arquivo CSV de entrada")
+    args = parser.parse_args()
+    
+    main(args.model, args.input)

@@ -1,44 +1,64 @@
-# Cria o modelo (aprende com os dados)
-
-from pathlib import Path
+# scripts/train.py
 import pandas as pd
 from sklearn.model_selection import train_test_split
+from sklearn.linear_model import LinearRegression
 from sklearn.ensemble import RandomForestRegressor
-from sklearn.preprocessing import StandardScaler
-from sklearn.pipeline import Pipeline
-from joblib import dump
-import json
+from xgboost import XGBRegressor
+from sklearn.metrics import mean_absolute_error, mean_squared_error, r2_score
+import joblib
+import os
 
-DATA_PATH = Path("data/internet_adoption_clean.csv")
-MODEL_DIR = Path("models")
-MODEL_DIR.mkdir(exist_ok=True)
+# Caminho dos dados
+DATA_PATH = "data/internet_adoption_clean_final.csv"
+MODEL_DIR = "models"
+os.makedirs(MODEL_DIR, exist_ok=True)
 
+# Carregar dados
 df = pd.read_csv(DATA_PATH)
 
-target = "Internet_Penetration (%)"
-features = df.select_dtypes(include="number").columns.tolist()
-features.remove(target)
+# Renomear colunas para facilitar uso
+df.columns = [c.strip().replace(' ', '_').replace('(', '').replace(')', '').replace('%', 'pct') for c in df.columns]
 
-X = df[features]
-y = df[target]
+# Definir alvo
+TARGET = 'Internet_Penetration_pct'
 
-X_train, X_test, y_train, y_test = train_test_split(
-    X, y, test_size=0.2, random_state=42
-)
+# Selecionar apenas colunas numéricas como features
+X = df.select_dtypes(include='number').drop(columns=[TARGET])
+y = df[TARGET]
 
-pipeline = Pipeline([
-    ("scaler", StandardScaler()),
-    ("model", RandomForestRegressor(n_estimators=100, random_state=42))
-])
+# Divisão treino/teste
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
 
-pipeline.fit(X_train, y_train)
+# Inicializar modelos
+models = {
+    "LinearRegression": LinearRegression(),
+    "RandomForest": RandomForestRegressor(n_estimators=100, random_state=42),
+    "XGBoost": XGBRegressor(n_estimators=100, random_state=42, eval_metric='rmse')
+}
 
-# Salvar modelo com compressão
-dump(pipeline, MODEL_DIR / "modelo_final.joblib", compress=3)
+# Treinar, avaliar e salvar resultados
+results = []
+for name, model in models.items():
+    model.fit(X_train, y_train)
+    y_pred = model.predict(X_test)
+    
+    mae = mean_absolute_error(y_test, y_pred)
+    rmse = mean_squared_error(y_test, y_pred, squared=False)
+    r2 = r2_score(y_test, y_pred)
+    
+    results.append({
+        "model": name,
+        "MAE": mae,
+        "RMSE": rmse,
+        "R2": r2
+    })
+    
+    # Salvar cada modelo
+    joblib.dump(model, os.path.join(MODEL_DIR, f"{name}.pkl"))
 
-# Salvar features
-with open(MODEL_DIR / "features.json", "w") as f:
-    json.dump(features, f)
+# Mostrar tabela de resultados
+results_df = pd.DataFrame(results)
+print("\nResultados dos modelos:\n", results_df)
 
-print("Modelo treinado e salvo em models/modelo_final.joblib")
-print("Features salvas em models/features.json")
+# Salvar resultados em CSV
+results_df.to_csv(os.path.join(MODEL_DIR, "model_metrics.csv"), index=False)
