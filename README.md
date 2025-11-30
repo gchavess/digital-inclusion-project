@@ -1,6 +1,3 @@
-<<<<<<< HEAD
-# digital-inclusion-project
-=======
 # Digital Inclusion Project
 
 ## 📄 Descrição do Projeto
@@ -70,16 +67,6 @@ Construir um modelo preditivo capaz de estimar a penetração de internet (%) em
 - **RMSE (Root Mean Squared Error):** erro médio quadrático, penaliza grandes desvios.
 - **MAE (Mean Absolute Error):** erro médio absoluto, interpreta facilmente a magnitude dos erros.
 
-### Resultados
-
-| Modelo            | MAE    | RMSE   | R²     |
-| ----------------- | ------ | ------ | ------ |
-| Linear Regression | 6.4139 | 7.8234 | 0.6867 |
-| Ridge Regression  | 6.4145 | 7.8226 | 0.6867 |
-| Lasso Regression  | 6.4243 | 7.8194 | 0.6870 |
-
-> Observação: os três modelos apresentaram performance muito similar, sendo o **Lasso Regression** levemente superior no R².
-
 ---
 
 ### 📁 Estrutura do Projeto
@@ -138,4 +125,3 @@ python scripts/predict.py
 ```
 
 4. Visualizar notebooks para exploração detalhada e análise.
->>>>>>> bd73557 (feat: init project)
