@@ -1,4 +1,5 @@
 # Digital Inclusion Project
+Alunos: Gustavo Chaves e Michael Varaldo
 
 ## 📄 Descrição do Projeto
 
@@ -125,3 +126,4 @@ python scripts/predict.py
 ```
 
 4. Visualizar notebooks para exploração detalhada e análise.
+
